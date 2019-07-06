@@ -1,5 +1,5 @@
 [package]
-name = "LVM"
+name = "lvm"
 version = "0.1.0"
 authors = ["theseriousadult <jack@gallabytes.com>"]
 edition = "2018"
