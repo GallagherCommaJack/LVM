@@ -36,7 +36,18 @@ pub enum Op {
     /// `SHA3(i, o)` stores the sha3 hash code of the contents of `i` in `o`.
     Sha3,
     /// `COPY(i, l_i, r_i, o, l_o)` copies the slice of bytes from `l_i` to `r_i` from `i` to `o`,
-    /// starting from `l_o`.
+    /// starting from `l_o`. In case that was hard to understand, here's an ASCII diagram:
+    ///
+    /// ```text
+    /// +-----+-----+---+    +-----+-----+--------+
+    /// |  l_i|  V  |r_i|    |  l_o|  V  |        |
+    /// +-----+-----+---+    +-----+-----+--------+
+    ///       |     |              |     |
+    ///       |      \            /      |
+    ///       |        -----------       |
+    ///        \                        /
+    ///         ------------------------
+    /// ```
     Copy,
     /// `LOAD(i, o)` fills `o` with the contents of memory starting at `i`.
     Load,
@@ -53,17 +64,23 @@ pub enum Op {
     /// continues with execution.
     JumpIf,
     /// Call is a varargs instruction.
-    /// Assuming `f` is a (constant) valid function index,
-    /// `i_1...i_n` and `o_1..o_m` are registers,
-    /// and the function pointed to by `f` takes `n` inputs and returns `m` outputs,
+    /// Assuming the following:
+    ///
+    /// - `f` is a (constant) valid function index,
+    /// - `i_1..i_n` and `o_1..o_m` are registers,
+    /// - the function pointed to by `f` takes `n` inputs of the same respective sizes as
+    /// `i_1..i_n`,
+    /// - the function pointed to by `f` returns `m` outputs of the same respective sizes as
+    /// `o_1..o_m`,
+    ///
     /// `CALL(f, i_1, i_2, ... i_n, o_1, o_2, ... o_m)`
     /// calls `f` on inputs `i_1..i_n` and stores the return values in `o_1..o_m`.
+    ///
     /// Because each function has a known signature, we can check validity of this at compile time.
     Call,
-    /// Like `CALL` but the first input is instead a register containing a function index.
-    /// Because we don't know which function is going to be referenced in that register, we can't
-    /// check at compile time that the right number of arguments were given. This is left up to the
-    /// programmer / the higher-level language targetting this VM.
+    /// `CALLI(r_f, r_1, r_2, .. r_n)` attempts to call the function referenced by the value
+    /// in `r_f` on registers `1..n`. Unlike with `CALL`, we can only check the validity of the
+    /// arguments at runtime.
     CallI,
     /// `RET(r_1, r_2, ... r_n)` returns the values contained in registers `r_1..r_n`.
     /// Because each function has a known signature, we can check validity of this at compile time.
