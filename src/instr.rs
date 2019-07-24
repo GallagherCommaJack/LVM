@@ -1,24 +1,42 @@
+#[derive(Eq, PartialEq, Debug)]
+pub enum Type {
+    U8,
+    U16,
+    U32,
+    U64,
+    I8,
+    I16,
+    I32,
+    I64,
+    // should we have floats?
+    // F32,
+    // F64,
+    Bool,
+    Bytes(usize),
+}
+
+#[derive(Eq, PartialEq, Debug)]
 pub enum Op {
     /// `ADD(l, r, o)` sets `o` to `l + r`, with overflow.
-    Add,
+    Add(Type),
     /// `MUL(l, r, o)` sets `o` to `l * r`, with overflow.
-    Mul,
+    Mul(Type),
     /// `SUB(l, r, o)` sets `o` to `l - r`, with overflow.
-    Sub,
+    Sub(Type),
     /// `UDIV(l, r, o)` sets `o` to the unsigned quotient of `l` by `r`.
-    Udiv,
+    Udiv(Type),
     /// `SDIV(l, r, o)` sets `o` to the signed quotient of `l` by `r`.
-    Sdiv,
+    Sdiv(Type),
     /// `UMOD(l, r, o)` sets `o` to the unsigned modulus of `l` by `r`.
-    Umod,
+    Umod(Type),
     /// `SMOD(l, r, o)` sets `o` to the signed modulus of `l` by `r`.
-    Smod,
+    Smod(Type),
     /// `POW(b, e, o)` sets `o` to the value of `b` raised to the `e` power.
-    Pow,
+    Pow(Type),
     /// `LT(l, r, o)` sets `o` to `TRUE` if `l < r`, otherwise false
-    Lt,
+    Lt(Type),
     /// `GT(l, r, o)` sets `o` to `TRUE` if `l > r`, otherwise false
-    Gt,
+    Gt(Type),
     /// `EQ(l, r, o)` sets `o` to `TRUE` if `l` and `r` are bitwise equal, otherwise false
     Eq,
     /// `AND(l, r, o)` stores the bitwise and of `l` and `r` at `o`.
@@ -91,6 +109,7 @@ pub enum Op {
 }
 
 /// An instruction is an opcode and a vector of arguments.
+#[derive(Eq, PartialEq, Debug)]
 pub struct Instr {
     pub op: Op,
     pub args: Vec<usize>,
